@@ -1,0 +1,57 @@
+html,
+body,
+div,
+p,
+table,
+tr,
+td,
+ul,
+ul li,
+input,
+img,
+h1,
+h2,
+h3,
+h4,
+h5,
+span,
+i,
+article,
+select,
+select option,
+section,
+header,
+textarea,
+br,
+hr,
+dl,
+dl dd,
+dl,
+dt {
+    margin: 0;
+    padding: 0
+}
+
+body {
+    color: #303133;
+    font-family: "Microsoft YaHei", "SimSun", sans-serif
+}
+html {
+    background-image: linear-gradient(to bottom right, #ccfbff 35%, #ef96c5);
+    background-size: cover;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    background-attachment: fixed;
+    font-size: 62.5%;
+}
+
+.flex {
+    display: flex;
+}
+.icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+}

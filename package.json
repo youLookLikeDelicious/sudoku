@@ -1,0 +1,20 @@
+{
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "gsap": "^3.7.1",
+    "vue": "^3.0.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.2.3",
+    "@vue/compiler-sfc": "^3.0.5",
+    "eslint-plugin-vue": "^7.12.1",
+    "eslint": "^7.29.0",
+    "sass": "^1.35.1",
+    "vite": "^2.3.8"
+  }
+}
