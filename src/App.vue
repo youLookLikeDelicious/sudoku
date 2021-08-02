@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import Grid from '@/components/grid.vue'
+import Grid from '@/components/grid-box.vue'
 
 </script>
 <style>
