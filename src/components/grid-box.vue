@@ -216,7 +216,7 @@ export default defineComponent({
         len = Math.max(parseInt(Math.random() * 60), 42)
         break
       }
-      len = 1
+      
       fillableLength = len
       cells.forEach(item => item.fixed = false)
       for (; i < len; i++) {
