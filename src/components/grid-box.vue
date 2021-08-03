@@ -530,7 +530,7 @@ export default defineComponent({
 <style lang="scss">
 $size: 5.5rem;
 $size-min: 4.5rem;
-$width: $size * 9 + 5.3rem;
+$width: $size * 9 + 5.1rem;
 $width-min: $size-min * 9 + 5.3rem;
   @keyframes spin-reverse {
     0% { 
@@ -592,7 +592,6 @@ $width-min: $size-min * 9 + 5.3rem;
   border-right: 0;
   border-bottom: 0;
   position: relative;
-  box-shadow: 1rem 1rem 1rem .1rem rgba($color: #d4deec, $alpha: .7);
   overflow: hidden;
   .cell-wrapper{
     margin-right: -.1rem;
