@@ -60,7 +60,7 @@
         </svg>
       </div>
       <div key="loading" :class="{ loading: loading }"></div>
-      <success key="convas" :time="time" @restart="startNewGame" v-model:showCanvas="successed"></success>
+      <success key="convas" @restart="startNewGame" v-model:showCanvas="successed"></success>
     </transition-group>
     <!-- print end -->
     <!-- 菜单部分 -->
@@ -216,7 +216,7 @@ export default defineComponent({
         len = Math.max(parseInt(Math.random() * 60), 42)
         break
       }
-      
+      len = 1
       fillableLength = len
       cells.forEach(item => item.fixed = false)
       for (; i < len; i++) {
@@ -529,9 +529,7 @@ export default defineComponent({
 
 <style lang="scss">
 $size: 5.5rem;
-$size-min: 4.5rem;
 $width: $size * 9 + 5.1rem;
-$width-min: $size-min * 9 + 5.3rem;
   @keyframes spin-reverse {
     0% { 
       transform: rotate(0deg);
@@ -580,27 +578,62 @@ $width-min: $size-min * 9 + 5.3rem;
 }
 // 游戏盒子样式
 .sudoku-container{
-  width: $width;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
+  border-right: 0;
   color: #304455;
-  background-color: rgba($color: #fff, $alpha: .7);
   font-weight: 200;
+  border-bottom: 0;
+  overflow: hidden;
+  position: relative;
   justify-content: stretch;
   font-smooth: antialiased;
-  border: .2rem solid #304455;
-  border-right: 0;
-  border-bottom: 0;
-  position: relative;
-  overflow: hidden;
+  // border: .2rem solid #304455;
+  // background-color: rgba($color: #fff, $alpha: .7);
   .cell-wrapper{
+    flex-grow: 1;
+    flex-basis: 10%;
+    padding-top: 10%;
     margin-right: -.1rem;
+    position: relative;
     margin-bottom: -.1rem;
+    background-color: #fff;
     border: .1rem solid #dbe4f1;
     transition: transform 1s, border-color .3s;
     &:nth-child(3n) {
       margin-right: 0rem;
       border-right: .2rem solid #304455;
+    }
+    &:nth-child(1) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(10) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(19) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(28) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(37) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(46) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(55) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(64) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(73) {
+      border-left: .2rem solid #304455;
+    }
+    &:nth-child(-n + 9) {
+      border-top: 2px solid #344861;
     }
     &:nth-child(27n + 19) {
       @extend %row-line;
@@ -637,18 +670,23 @@ $width-min: $size-min * 9 + 5.3rem;
     background-color: #64b3f4 !important;
   }
   .sudoku-cell{
-    background-color: #fff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     outline: none;
-    justify-content: center;
-    align-items: center;
-    font-size: 2.5rem;
     padding: .2rem;
+    cursor: pointer;
     color: #304455;
     color: transparent;
+    align-items: center;
+    box-sizing: border-box;
+    justify-content: center;
+    background-color: #fff;
     text-shadow: 0 0 0 #666;
     transition: background-color .3s;
-    cursor: pointer;
     .remark{
       display: flex;
       font-size: 1.4rem;
@@ -666,9 +704,10 @@ $width-min: $size-min * 9 + 5.3rem;
     }
     .cell-content{
       width: 100%;
-      height: 100%;
       z-index: 2;
-      line-height: $size;
+      display: flex;
+      justify-items: center;
+      justify-content: center;
     }
   }
 }
@@ -696,25 +735,25 @@ $width-min: $size-min * 9 + 5.3rem;
   }
 }
 @media screen and (min-width: 0) {
+  .game-info-wrapper, .sudoku-container, .menus{
+    padding: 0 2rem;
+  }
   .sudoku-container{
-    width: $width-min;
     margin-bottom: 2.1rem;
-    .sudoku-cell{
-      width: $size-min;
-      height: $size-min;
-    }
   }
   .gird-wrapper{
     flex-wrap: wrap;
   }
   .menus {
-    flex-basis: 100%;
     margin-left: 0;
+    flex-basis: 100%;
+    .btn{
+      padding: 1.3rem 0 !important;
+    }
   }
-  .gird-wrapper{
-    max-width: $width-min;
+  .sudoku-cell{
+    font-size: 1.8rem;
   }
-
   // 软键盘样式
   .keybords-wrapper{
     flex-wrap: nowrap;
@@ -726,22 +765,30 @@ $width-min: $size-min * 9 + 5.3rem;
     }
   }
 }
-@media screen and (min-width: 97rem) {
-  .sudoku-container{
-    width: $width;
-    .sudoku-cell{
-      width: $size;
-      height: $size;
-    }
+@media screen and (min-width: 57rem) {
+  .sudoku-cell{
+    font-size: 2.5rem;
   }
-  .gird-wrapper{
-    max-width: $width + 2.5rem + 26rem;
+}
+@media screen and (min-width: 97rem) {
+  .game-info-wrapper, .sudoku-container, .menus{
+    padding: 0;
+  }
+  .sudoku-container{
+    max-width: $width;
+  }
+  .sudoku-cell{
+    font-size: 2.5rem;
   }
   .menus{
     margin-top: 0;
     flex-basis: 26rem;
     margin-left: 2.1rem;
     background-color: none;
+    .new-game{
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
   }
   // 软键盘样式
   .keybords-wrapper{
@@ -781,14 +828,15 @@ $width-min: $size-min * 9 + 5.3rem;
   }
 }
 .gird-wrapper{
+  width: 100%;
   display: flex;
   margin: 0 auto;
-  width: fit-content;
+  max-width: 90rem;
   box-sizing: border-box;
-  justify-content: center;
+  justify-content: space-between;
 }
 .menus {
-  width: 26rem;
+  width: 100%;
   display: flex;
   height: fit-content;
   flex-direction: row;
@@ -805,8 +853,6 @@ $width-min: $size-min * 9 + 5.3rem;
     .new-game{
       flex: 1 1 100%;
       margin-bottom: 2.1rem;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
       font-weight: bold;
     }
     a{

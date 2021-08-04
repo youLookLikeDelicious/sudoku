@@ -11,3 +11,6 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## 在线地址
+[在线地址](https://sudoku.blog1997.com)

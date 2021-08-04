@@ -119,9 +119,14 @@ export default {
         canvas.width = cw = canvas.parentElement.parentElement.offsetWidth
         canvas.height = ch = canvas.parentElement.parentElement.offsetHeight
         ballList = Array.from({length: 81}).map(() => new Ball())
-        float()
       })
 
+    watch(() => props.showCanvas,
+      (val)=> {
+        if (val) float()
+        else cancelAnimationFrame(reqFrameId)
+      }
+    )
     const delayTime = ref(0)
     watch(
       () => props.time,
