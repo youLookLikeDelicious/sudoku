@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, onBeforeMount, onUnmounted, reactive, ref, toRaw, watch, watchEffect } from 'vue'
+import { computed, defineComponent, onBeforeMount, onUnmounted, provide, reactive, ref, toRaw, watch, watchEffect } from 'vue'
 import generateSudoku from '@/utils/generator'
 import success from './success.vue'
 import { getGridIndex, getColIndex, getRowIndex, checkRow, checkCol, checkGrid } from '@/utils/check'
@@ -216,7 +216,7 @@ export default defineComponent({
         len = Math.max(parseInt(Math.random() * 60), 42)
         break
       }
-      len = 1
+      
       fillableLength = len
       cells.forEach(item => item.fixed = false)
       for (; i < len; i++) {
@@ -498,6 +498,7 @@ export default defineComponent({
       }
     })
 
+    provide('time', time)
     return {
       loading,
       cells,
@@ -549,7 +550,7 @@ $width: $size * 9 + 5.1rem;
     content: "";
     position: absolute;
     top: 36%;
-    left: 36%;
+    left: 37%;
     right: .5rem;
     bottom: .5rem;
     width: 28%;
@@ -563,7 +564,7 @@ $width: $size * 9 + 5.1rem;
   &::after{
     content: "";
     position: absolute;
-    top: 32%;
+    top: 31%;
     left: 33%;
     right: .5rem;
     bottom: .5rem;
@@ -766,11 +767,6 @@ $width: $size * 9 + 5.1rem;
   }
 }
 @media screen and (min-width: 57rem) {
-  .sudoku-cell{
-    font-size: 2.5rem;
-  }
-}
-@media screen and (min-width: 97rem) {
   .game-info-wrapper, .sudoku-container, .menus{
     padding: 0;
   }

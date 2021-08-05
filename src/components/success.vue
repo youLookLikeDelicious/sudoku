@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { inject, onBeforeUnmount, ref, watch } from 'vue'
 import timeConsuming from './time-consuming.vue'
 let ctx, cw, ch
   
@@ -85,19 +85,13 @@ export default {
       default() {
         return false
       }
-    },
-    time: {
-      type: Number,
-      default() {
-        return 0
-      }
     }
   },
   components: { timeConsuming },
   emits: ['restart'],
-  setup(props, { emit }) {
+  setup(props, context) {
+    let reqFrameId
     const canvas = ref('')
-    let reqFrameId, timeHandler
     const float = () => {
       reqFrameId = requestAnimationFrame.call(window, float)
       ctx.clearRect(0, 0, cw, ch)
@@ -106,7 +100,7 @@ export default {
       }))
     }
   
-
+    const time = inject('time')
     // 设置canvas的宽高
     watch(canvas,
       (canvas) => {
@@ -123,21 +117,19 @@ export default {
 
     watch(() => props.showCanvas,
       (val)=> {
-        if (val) float()
-        else cancelAnimationFrame(reqFrameId)
+        if (val) {
+          float()
+          setTimeout(() => {
+            delayTime.value = time.value
+          }, 2500)
+        }
+        else {
+          cancelAnimationFrame(reqFrameId)
+        }
       }
     )
     const delayTime = ref(0)
-    watch(
-      () => props.time,
-      (val) => {
-        if (!val) return
-        clearTimeout(timeHandler)
-        timeHandler = setTimeout(() => {
-          delayTime.value = val
-        }, 2000)
-      }
-    )
+
     // 取消动画
     onBeforeUnmount(() => {
       cancelAnimationFrame(reqFrameId)
@@ -145,9 +137,9 @@ export default {
     
     // 开始新游戏
     const handleNewGame = () => {
-      emit('update:showCanvas', false)
-      emit('restart')
       delayTime.value = 0
+      context.emit('restart')
+      context.emit('update:showCanvas', false)
     }
     return {
       canvas,
@@ -177,7 +169,7 @@ export default {
     z-index: 999;
     letter-spacing: .3rem;
     color: #fff;
-    transform: translateY(20rem);
+    transform: translateY(100%);
     font-size: 2.7rem;
     font-weight: 400;
     .finish-title{
