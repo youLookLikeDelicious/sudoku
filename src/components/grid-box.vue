@@ -37,31 +37,62 @@
     </div>
     <!-- 数独容器 部分 -->
     <!-- print begin -->
-    <transition-group name="cell" tag="div" class="sudoku-container">
-      <div v-for="(cell, index) in cells" :key="cell.id" class="cell-wrapper" @click.stop="handleClickCell(index)">
-        <div :class="['sudoku-cell', {'selected': selectedGrid.includes(index)}, { 'selected-same': sameItemStack.includes(index) }, {'selected-on': currentIndex === index}, { 'completed-cell': completedCells.includes(index) }]">
-          <span v-if="currentCell.remark && currentIndex === index" class="remark">
-            <span v-show="cell.remarkList.includes(1)">1</span>
-            <span v-show="cell.remarkList.includes(2)">2</span>
-            <span v-show="cell.remarkList.includes(3)">3</span>
-            <span v-show="cell.remarkList.includes(4)">4</span>
-            <span v-show="cell.remarkList.includes(5)">5</span>
-            <span v-show="cell.remarkList.includes(6)">6</span>
-            <span v-show="cell.remarkList.includes(7)">7</span>
-            <span v-show="cell.remarkList.includes(8)">8</span>
-            <span v-show="cell.remarkList.includes(9)">9</span>
-          </span>
-          <span v-else :class="['cell-content', { 'writeable-cell': cell.fixed }]" v-html="cell.number"></span>
+    <div class="sudoku-container-wrap">
+      <transition-group name="cell" tag="div" class="sudoku-container">
+        <div v-for="(cell, index) in cells" :key="cell.id" class="cell-wrapper" @click.stop="handleClickCell(index)">
+          <div :class="['sudoku-cell', {'selected': selectedGrid.includes(index)}, { 'selected-same': sameItemStack.includes(index) }, {'selected-on': currentIndex === index}, { 'completed-cell': completedCells.includes(index) }]">
+            <span v-if="cells[index].remark" class="remark">
+              <span v-visible="cell.remarkList.includes(1)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">1</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(2)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">2</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(3)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">3</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(4)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">4</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(5)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">5</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(6)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">6</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(7)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">7</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(8)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">8</text>
+                </svg>
+              </span>
+              <span v-visible="cell.remarkList.includes(9)">
+                <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                  <text text-anchor="middle" x="25" y="35">9</text>
+                </svg>
+              </span>
+            </span>
+            <span v-else :class="['cell-content', { 'writeable-cell': cell.fixed }]" v-html="cell.number"></span>
+          </div>
         </div>
-      </div>
-      <div v-if="isPause" class="is-pausing flex" @click.stop="togglePause">
-        <svg class="icon" aria-hidden="true">
-          <use xlink:href="#icon-kaishi"></use>
-        </svg>
-      </div>
-      <div key="loading" :class="{ loading: loading }"></div>
-      <success key="convas" @restart="startNewGame" v-model:showCanvas="successed"></success>
-    </transition-group>
+      </transition-group>
+    </div>
     <!-- print end -->
     <!-- 菜单部分 -->
     <div class="menus">
@@ -72,7 +103,7 @@
         </svg>&nbsp;
         新游戏
       </a>
-      <a href="/" :class="['btn', {'btn-disable': !historyStack.length}]" @click.prevent="handleBack">
+      <a href="/" :class="['btn', {'btn-disable': !historyStack.length}]" @click.prevent="handleBack(menuUsable)">
         <svg class="icon" aria-hidden="true">
           <use xlink:href="#icon-undo"></use>
         </svg> 回退</a>
@@ -82,7 +113,7 @@
         </svg>
         标记
       </a>
-      <a href="/" class="btn" @click.prevent="handleClickRemark">
+      <a href="/" class="btn" @click.prevent="handleClear">
         <svg class="icon" aria-hidden="true">
           <use xlink:href="#icon-qingchu"></use>
         </svg> 清除</a>
@@ -92,22 +123,35 @@
       </div>
     </div>
   </div>
+  <!-- 暂停遮罩部分 -->
+  <pause-mask :isPause="isPause" @togglePause="togglePause" />
+  <!-- 游戏成功遮罩部分 -->
+  <success key="convas" @restart="startNewGame" :showCanvas="successed"></success>
+  <!-- 游戏载入遮罩部分 -->
+  <teleport to=".sudoku-container-wrap">
+    <div :class="{ loading: loading }"></div>
+  </teleport>
 </template>
 
 <script>
-import { computed, defineComponent, onBeforeMount, onUnmounted, provide, reactive, ref, toRaw, watch, watchEffect } from 'vue'
+import { computed, defineComponent, onBeforeMount, onUnmounted, provide, ref, watch } from 'vue'
 import generateSudoku from '@/utils/generator'
 import success from './success.vue'
-import { getGridIndex, getColIndex, getRowIndex, checkRow, checkCol, checkGrid } from '@/utils/check'
 import timeConsuming from './time-consuming.vue'
+import pauseMask from './pause-mask.vue'
+import { generator } from '@/composable/generator'
 export default defineComponent({
-  components: {success, timeConsuming},
+  components: {success, timeConsuming, pauseMask},
   setup() {
-    const [cells, historyStack] = [reactive([]), reactive([])]
-    // 正确的行/列/单元格
-    const completedCells = reactive([])
-    // 当前选中的元素多索引
-    const currentIndex = ref(-1)
+    let timeHandler
+
+    const handleSuccess = () => {
+      clearTimeout(timeHandler)
+      successed.value = true
+    }
+
+    const { cells, historyStack, fillSudoku, currentIndex, handleBack, completedCells, selectedGrid, currentCell, sameItemStack } = generator(handleSuccess)
+
     const loading = ref(false)
     const successed = ref(false)
     
@@ -122,69 +166,7 @@ export default defineComponent({
       2: '中等',
       3: '困难'
     }
-    let fillableLength = 0, currentFilledLength = 0, cellWatcher = [], previousIndex = -1, timeHandler
 
-    // 当前选中的单元格index
-    const selectedGrid = computed({
-      get: () => {
-        if (currentIndex.value < 0) {
-          return []
-        }
-        const arr = []
-        let p = getGridIndex(currentIndex.value), i, len, tempP
-        for (i = 0, len = 3; i < len; i++) {
-          if (p !== currentIndex.value) {
-            arr.push(p)
-          }
-          if (++p !== currentIndex.value) {
-            arr.push(p)
-          }
-          if (++p !== currentIndex.value) {
-            arr.push(p)
-          }
-          p += 7
-        }
-
-        p = getColIndex(currentIndex.value)
-        for (i = 0, len = 9; i < len; i++) {
-          tempP = p + i * 9
-          if (tempP !== currentIndex.value) {
-            arr.push(tempP)
-          }
-        }
-
-        p = getRowIndex(currentIndex.value)
-        for (i = 0, len = 9; i < len; i++) {
-          tempP = p + i
-          if (tempP !== currentIndex.value) {
-            arr.push(tempP)
-          }
-        }
-        return arr
-      }
-    })
-    const sameItemStack = computed({
-      get: () => {
-        const arr = []
-        const cell = cells[currentIndex.value]
-        if (currentIndex.value === -1 || !cell.number) {
-          return []
-        }
-        // 如果是固定值,获取所有相同值的索引
-        cells.forEach((item, index) => {
-          if (item.number === cell.number) {
-            arr.push(index)
-          }
-        })
-        return arr
-      }
-    })
-    const currentCell = computed(() => {
-      if (currentIndex.value === -1) {
-        return ''
-      }
-      return cells[currentIndex.value]
-    })
     const menuUsable = computed(() => {
       return !successed.value && !isPause.value
     })
@@ -195,128 +177,6 @@ export default defineComponent({
         ++time.value
         countTime()
       }, 1000)
-    }
-
-    // 随机隐藏单元格
-    const hideSudoku = () => {
-      handleClearWatchCell()
-      const arr = Array.from({ length: 81 }).map((item, index) => index)
-      let i = 0, len, arrIndex, cellIndex
-      switch(difficultyLevel.value) {
-      // 简单
-      case 1:
-        len = Math.max(parseInt(Math.random() * 27), 17)
-        break
-      // 普通
-      case 2:
-        len = Math.max(parseInt(Math.random() * 40), 30)
-        break
-      // 困难
-      case 3:
-        len = Math.max(parseInt(Math.random() * 60), 42)
-        break
-      }
-      
-      fillableLength = len
-      cells.forEach(item => item.fixed = false)
-      for (; i < len; i++) {
-        arrIndex = Math.floor(Math.random() * arr.length)
-        cellIndex = arr[arrIndex]
-        cells[cellIndex].number = ''
-        cells[cellIndex].fixed = true
-        arr.splice(arrIndex, 1)
-      }
-
-      handleWatchCell()
-      time.value = 0
-      clearTimeout(timeHandler)
-      countTime()
-      historyStack.splice(0, historyStack.length)
-    }
-
-    // 监听单元格的值修改事件
-    const handleWatchCell = () => {
-      cellWatcher = cells.filter((cell) => {
-        return cell.fixed
-      }).map((cell) => {
-        return watch(
-          () => cell.number,
-          (newVal, oldVal) => {
-            if (newVal === oldVal) {
-              return
-            }
-            
-            if (previousIndex != currentIndex.value) {
-              previousIndex = currentIndex.value
-              if (newVal) ++currentFilledLength
-              else --currentFilledLength
-            }
-            
-            historyStack.push({ position: currentIndex.value, newVal, oldVal })
-
-            // 数独已完成
-            if (currentFilledLength === fillableLength) {
-              handleCheckGame()
-            } else {
-              const tempCompletedCells = []
-              const rawCells = toRaw(cells)
-              // checkGrid(currentIndex.value)
-              // 检查行
-              let ind = checkRow(currentIndex.value, newVal, rawCells, false), len, i
-              if (Number.isInteger(ind)) {
-                for (i = ind, len = ind + 9; i < len; i++) {
-                  tempCompletedCells.push(i)
-                }
-              }
-
-              // 检查列
-              ind = checkCol(currentIndex.value, newVal, rawCells, false)
-              // 该列符合规则
-              if (Number.isInteger(ind)) {
-                for (i = ind, len = ind + 72; i <= len; i += 9) {
-                  tempCompletedCells.push(i)
-                }
-              }
-
-              // 检查小九宫格
-              ind = checkGrid(currentIndex.value, newVal, rawCells, false)
-
-              if (Number.isInteger(ind)) {
-                for (i = 0, len = 3; i < len; i++) {
-                  tempCompletedCells.push(ind)
-                  tempCompletedCells.push(++ind)
-                  tempCompletedCells.push(++ind)
-                  ind += 7
-                }
-              }
-
-              completedCells.splice(0, 0, ...tempCompletedCells)
-            }
-          },
-          { deep: true }
-        )
-      })
-    }
-
-    // 检查游戏是否结束
-    const handleCheckGame = () => {
-      const tempCells = toRaw(cells)
-      let i, len, cell, result = true
-      for (i = 0, len = tempCells.length; i < len; i++) {
-        cell = tempCells[i]
-        if (!cell.fixed) {
-          continue
-        }
-        if (!Number.isInteger(checkRow(i, cell.number, tempCells, false)) || !Number.isInteger(checkCol(i, cell.number, tempCells, false)) || !Number.isInteger(i, cell.number, tempCells, false)) {
-          result = false
-          break
-        }
-      }
-      // console.log(checkRow(i, cell.number, tempCells, false), checkCol(i, cell.number, tempCells, false), checkGrid(i, cell.number, tempCells, false))
-      if (result) {
-        clearTimeout(timeHandler)
-        successed.value = true
-      }
     }
 
     // 监听游戏的结果
@@ -330,26 +190,20 @@ export default defineComponent({
       }
     )
 
-    const handleClearWatchCell = () => {
-      if (cellWatcher.length) {
-        cellWatcher.map(callBack => {
-          callBack()
-        })
-        cellWatcher = ''
-      }
-    }
-    // 初始化数独游戏
-    const init = () => {
-      cells.push(...generateSudoku())
-      hideSudoku()
-    }
-
     let difficultyLevel = ref(1)
 
     // 点击标记按钮
     const handleClickRemark = () => {
       if (!currentCell.value || !menuUsable.value) return
-      currentCell.value.remark = !currentCell.value.remark
+      const marked = !currentCell.value.remark
+      currentCell.value.remark = marked
+      // 标记状态
+      if (marked && currentCell.value.number) {
+        currentCell.value.number = ''
+      } else if (!marked) {
+        // 取消标记
+        currentCell.value.remarkList.splice(0)
+      }
     }
 
     // 选中当前的元素
@@ -386,20 +240,11 @@ export default defineComponent({
       } else {
         switch (val) {
         case 'r':
-          currentCell.value.remark = !currentCell.value.remark
+          handleClickRemark()
           break
         }
       }
     }
-
-    // 监听高亮的单元格
-    watchEffect(() => {
-      if (completedCells.length) {
-        setTimeout(() => {
-          completedCells.splice(0, completedCells.length)
-        }, 500)
-      }
-    })
 
     onBeforeMount(() => {
       document.addEventListener('keyup', handleKeyUp)
@@ -408,14 +253,13 @@ export default defineComponent({
       document.removeEventListener('keyup', handleKeyUp)
     })
 
-    // 钩子函数
-    init()
-
     // 开始新游戏
     const startNewGame = () => {
-      currentFilledLength = 0
       if (loading.value) {
         return
+      }
+      if (successed) {
+        successed.value = false
       }
       new Promise(resolve => {
         loading.value = true
@@ -424,9 +268,7 @@ export default defineComponent({
         }, 100)
       }).then(() => {
         new Promise((resolve) => {
-          currentIndex.value = -1
-          cells.splice(0, 81, ...generateSudoku())
-          hideSudoku()
+          start()
           window.setTimeout(() => {
             resolve(0)
           }, 1100)
@@ -434,17 +276,6 @@ export default defineComponent({
           loading.value = false
         })
       })
-    }
-
-    // 回退操作
-    const handleBack = () => {
-      if (!historyStack.length || !menuUsable.value) {
-        return
-      }
-      handleClearWatchCell()
-      const item = historyStack.pop()
-      cells[item.position].number = item.oldVal
-      handleWatchCell()
     }
 
     // 点击软键盘事件
@@ -499,6 +330,24 @@ export default defineComponent({
     })
 
     provide('time', time)
+
+    // 清除按钮
+    const handleClear = () => {
+      if (currentCell.value.remark) {
+        currentCell.value.remarkList.splice(0)
+      } else {
+        currentCell.value.number = ''
+      }
+    }
+
+    // 开始游戏
+    const start = () => {
+      clearTimeout(timeHandler)
+      time.value = 0
+      countTime()
+      fillSudoku(difficultyLevel.value)
+    }
+    start()
     return {
       loading,
       cells,
@@ -522,7 +371,8 @@ export default defineComponent({
       clickDifficalty,
       time,
       isPause,
-      togglePause
+      togglePause,
+      handleClear
     }
   }
 })
@@ -531,20 +381,91 @@ export default defineComponent({
 <style lang="scss">
 $size: 5.5rem;
 $width: $size * 9 + 5.1rem;
-  @keyframes spin-reverse {
-    0% { 
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(-360deg);
+@keyframes spin-reverse {
+  0% { 
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+@media screen and (min-width: 0) {
+  .game-info-wrapper, .sudoku-container, .menus{
+    padding: 0 2rem;
+  }
+  .sudoku-container{
+    margin-bottom: 2.1rem;
+  }
+  .gird-wrapper{
+    flex-wrap: wrap;
+  }
+  .menus {
+    margin-left: 0;
+    flex-basis: 100%;
+    .btn{
+      padding: 1.3rem 0 !important;
     }
   }
+  .sudoku-cell{
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+  // 软键盘样式
+  .keybords-wrapper{
+    flex-wrap: nowrap;
+    .key-box{
+      flex-basis: 2.1rem;
+      &:hover{
+        background-color: none;
+      }
+    }
+  }
+}
+@media screen and (min-width: 57rem) {
+  .game-info-wrapper, .sudoku-container, .menus{
+    padding: 0;
+  }
+  .sudoku-container{
+    margin-bottom: 0;
+  }
+  .sudoku-container-wrap{
+    max-width: $width;
+  }
+  .sudoku-cell{
+    font-size: 2.5rem;
+    font-weight: normal;
+  }
+  
+  .menus{
+    margin-top: 0;
+    flex-basis: 26rem;
+    margin-left: 2.1rem;
+    background-color: none;
+    .new-game{
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+  }
+  // 软键盘样式
+  .keybords-wrapper{
+    flex-wrap: wrap;
+    .key-box{
+      flex-basis: 32%;
+      border-radius: .5rem;
+      background-color: #f5f7fa;
+      &:hover{
+        background-color: #eaeef4;
+      }
+    }
+  }
+}
 .loading {
   width: 100%;
   height: 100%;
-  position: absolute;
   z-index: 999;
   display: block;
+  position: absolute;
   background-color: rgba(#fff, .7);
   &::before {
     content: "";
@@ -577,64 +498,62 @@ $width: $size * 9 + 5.1rem;
     animation: spin-reverse .7s linear reverse infinite;
   }
 }
+.sudoku-container-wrap{
+  width: 100%;
+  display: flex;
+  position: relative;
+}
 // 游戏盒子样式
 .sudoku-container{
   width: 100%;
   display: flex;
-  flex-wrap: wrap;
-  border-right: 0;
+  flex-wrap: wrap;;
   color: #304455;
-  font-weight: 200;
-  border-bottom: 0;
-  overflow: hidden;
   position: relative;
   justify-content: stretch;
-  font-smooth: antialiased;
-  // border: .2rem solid #304455;
-  // background-color: rgba($color: #fff, $alpha: .7);
   .cell-wrapper{
     flex-grow: 1;
-    flex-basis: 10%;
-    padding-top: 10%;
-    margin-right: -.1rem;
+    flex-basis: 11%;
+    padding-top: 11%;
     position: relative;
+    margin-right: -.1rem;
     margin-bottom: -.1rem;
+    box-sizing: border-box;
     background-color: #fff;
     border: .1rem solid #dbe4f1;
     transition: transform 1s, border-color .3s;
     &:nth-child(3n) {
-      margin-right: 0rem;
-      border-right: .2rem solid #304455;
+      @extend %col-line;
     }
     &:nth-child(1) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(10) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(19) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(28) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(37) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(46) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(55) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(64) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(73) {
-      border-left: .2rem solid #304455;
+      @extend %left-line;
     }
     &:nth-child(-n + 9) {
-      border-top: 2px solid #344861;
+      @extend %top-line;
     }
     &:nth-child(27n + 19) {
       @extend %row-line;
@@ -671,7 +590,6 @@ $width: $size * 9 + 5.1rem;
     background-color: #64b3f4 !important;
   }
   .sudoku-cell{
-    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -680,8 +598,8 @@ $width: $size * 9 + 5.1rem;
     outline: none;
     padding: .2rem;
     cursor: pointer;
-    color: #304455;
     color: transparent;
+    position: absolute;
     align-items: center;
     box-sizing: border-box;
     justify-content: center;
@@ -689,18 +607,27 @@ $width: $size * 9 + 5.1rem;
     text-shadow: 0 0 0 #666;
     transition: background-color .3s;
     .remark{
+      width: 100%;
+      height: 100%;
       display: flex;
-      font-size: 1.4rem;
-      width: $size;
-      height: $size;
       flex-wrap: wrap;
       color: #424852;
+      align-items: center;
+      font-size: clamp(1rem, 1vw, 1.4rem);
       span{
-        padding: .1rem;
-        width: $size / 3;
-        height: $size / 3;
-        display: block;
+        height: 33%;
+        display: flex;
+        flex-basis: 33%;
+        overflow: hidden;
+        align-items: center;
         box-sizing: border-box;
+        justify-content: center;
+        transform-origin: center;
+        svg{
+          width: 100%;
+          height: 100%;
+          font-size: 3rem;
+        }
       }
     }
     .cell-content{
@@ -709,93 +636,6 @@ $width: $size * 9 + 5.1rem;
       display: flex;
       justify-items: center;
       justify-content: center;
-    }
-  }
-}
-// 游戏暂停的样式
-.is-pausing{
-  align-items: center;
-  justify-content: center;
-  content: '';
-  width: 100%;
-  top: -.2rem;
-  height: 100%;
-  left: -.4rem;
-  z-index: 9999;
-  cursor: pointer;
-  position: absolute;
-  background-color: #fff;
-  transition: background-color 1s ease-in-out;
-  svg{
-    $size: 5rem;
-    width: $size;
-    height: $size;
-    border-radius: $size;
-    padding: 2rem;
-    background-color: #d4deec;
-  }
-}
-@media screen and (min-width: 0) {
-  .game-info-wrapper, .sudoku-container, .menus{
-    padding: 0 2rem;
-  }
-  .sudoku-container{
-    margin-bottom: 2.1rem;
-  }
-  .gird-wrapper{
-    flex-wrap: wrap;
-  }
-  .menus {
-    margin-left: 0;
-    flex-basis: 100%;
-    .btn{
-      padding: 1.3rem 0 !important;
-    }
-  }
-  .sudoku-cell{
-    font-size: 1.8rem;
-  }
-  // 软键盘样式
-  .keybords-wrapper{
-    flex-wrap: nowrap;
-    .key-box{
-      flex-basis: 2.1rem;
-      &:hover{
-        background-color: none;
-      }
-    }
-  }
-}
-@media screen and (min-width: 57rem) {
-  .game-info-wrapper, .sudoku-container, .menus{
-    padding: 0;
-  }
-  .sudoku-container{
-    max-width: $width;
-  }
-  .sudoku-cell{
-    font-size: 2.5rem;
-  }
-  .menus{
-    margin-top: 0;
-    flex-basis: 26rem;
-    margin-left: 2.1rem;
-    background-color: none;
-    .new-game{
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
-  }
-  // 软键盘样式
-  .keybords-wrapper{
-    flex-wrap: wrap;
-    .key-box{
-      flex-basis: 32%;
-      border-radius: .5rem;
-      background-color: #f5f7fa;
-      &:hover{
-        background-color: #eaeef4;
-      }
     }
   }
 }
