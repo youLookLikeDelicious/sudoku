@@ -1,11 +1,14 @@
 import checkCell from './check'
+
 /**
  * 生成数独
- * 
+ * @param {Int} hiddenNum 随机隐藏的数量 默认是0
  * @return {array}
  */
-const generateSudoku = function() {
+const generateSudoku = function(hiddenNum = 0) {
+  let arrIndex, cellIndex
   const idList = Array.apply(null, { length: 81 }).map((val, index) => index)
+
   const arr = Array.apply(null, { length: 81 }).map(() => {
     const position = Math.floor(Math.random() * idList.length)
     const tempRandom = idList[position]
@@ -27,6 +30,21 @@ const generateSudoku = function() {
   }
 
   backTracking(arr)
+
+  arr.forEach(item => item.fixed = false)
+
+  // 随机隐藏单元格
+  if (hiddenNum) {
+    const tempArr = Array.from({ length: 81 }).map((item, index) => index)
+    
+    for (let i = 0; i < hiddenNum; i++) {
+      arrIndex = Math.floor(Math.random() * tempArr.length)
+      cellIndex = tempArr[arrIndex]
+      arr[cellIndex].number = ''
+      arr[cellIndex].fixed = true
+      tempArr.splice(arrIndex, 1)
+    }
+  }
 
   return arr
 }

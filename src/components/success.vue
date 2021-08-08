@@ -1,14 +1,16 @@
 <template>
-  <transition name="canvas">
-    <div v-show="showCanvas" class="canvas-effect">
-      <canvas ref="canvas"></canvas>
-      <div class="finished-game-content">
-        <div class="finish-title">恭喜完成挑战</div>
-        <time-consuming :time="delayTime" :enableGsap="true"></time-consuming>
-        <div class="restart-btn" @click="handleNewGame">新游戏</div>
+  <teleport to=".sudoku-container-wrap">
+    <transition name="canvas" appear>
+      <div v-show="showCanvas" class="canvas-effect">
+        <canvas ref="canvas"></canvas>
+        <div class="finished-game-content">
+          <div class="finish-title">恭喜完成挑战</div>
+          <time-consuming :time="delayTime" :enableGsap="true" class="success-time-wrapper"></time-consuming>
+          <div class="restart-btn" @click="handleNewGame">新游戏</div>
+        </div>
       </div>
-    </div>
-  </transition>
+    </transition>
+  </teleport>
 </template>
 
 <script>
@@ -139,7 +141,6 @@ export default {
     const handleNewGame = () => {
       delayTime.value = 0
       context.emit('restart')
-      context.emit('update:showCanvas', false)
     }
     return {
       canvas,
@@ -152,11 +153,12 @@ export default {
 
 <style lang="scss">
 .canvas-effect{
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  z-index: 999;
   position: absolute;
-  left: 0;
-  top: 0;
   canvas{
     position: absolute;
     left: 0;
@@ -173,26 +175,22 @@ export default {
     font-size: 2.7rem;
     font-weight: 400;
     .finish-title{
-      opacity: 0;
       margin-bottom: 2.1rem;
-      animation: finish-title .5s cubic-bezier(0, 0.68, 0.35, 1.41) 1s 1 forwards;
     }
   }
   // 新游戏按钮样式
   .restart-btn{
     width: 17rem;
     height: 5.5rem;
-    line-height: 5rem;
     cursor: pointer;
+    line-height: 5rem;
     margin: 2rem auto;
-    opacity: 0;
     font-size: 1.6rem;
     font-weight: 600;
     position: relative;
-    border: .2rem solid #fff;
     transition: color .5s;
     box-sizing: border-box;
-    animation:1s restart-btn cubic-bezier(0.18, 0.89, 0.45, 1.38) 1.6s 1  forwards;
+    border: .2rem solid #fff;
     &:hover{
       color: rgb(0, 153, 255);
     }
@@ -240,35 +238,36 @@ export default {
     }
   }
 }
-@keyframes finish-title {
-  0%{
-    transform: translateY(-5rem) translateX(-13rem);
-    opacity: 0;
+// 遮罩的过度动画
+.canvas-enter-active, .canvas-leave-active{
+  transition: transform 3s, opacity .7s;
+  .success-time-wrapper{
+    transition: opacity 1s 2s;
   }
-  100%{
-    opacity: 1;
-    transform: translateY(0);
+  .finish-title {
+    transition: transform .7s, opacity .7s;
+  }
+  .restart-btn{
+    transition: transform .7s 1s, opacity .7s 1s;
   }
 }
-@keyframes restart-btn {
-  0%{
+.canvas-enter-from, .canvas-leave-to{
+  opacity: 0;
+  .success-time-wrapper{
+    opacity: 0;
+  }
+  .finish-title{
+    opacity: 0;
+    transform: translateY(-5rem) translateX(-13rem);
+  }
+  .restart-btn {
     opacity: 0;
     transform: translateY(-5rem) translateX(-12rem);
   }
-  100%{
+}
+.canvas-enter-to, .canvas-leave-from{
+  .restart-btn{
     opacity: 1;
-    transform: translateY(0);
   }
-}
-.cell-enter-to{
-  // transform: rotate3d(.1, .7, .7, 360deg) !important;
-  opacity: 1;
-}
-.cell-enter-from{
-  opacity: 0;
-}
-.cell-enter-active{
-  transition: opacity 1s ease-in;
-  z-index: 9999;
 }
 </style>
