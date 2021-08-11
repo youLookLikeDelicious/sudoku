@@ -1,6 +1,6 @@
 # sudoku
 
-vit + vue3编写的数独游戏
+vit + vue3编写的数独游戏,手机端和pc端自适应
 
 ## 运行
 ```bash
