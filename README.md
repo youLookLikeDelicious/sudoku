@@ -1,4 +1,4 @@
-# suduku
+# sudoku
 
 vit + vue3编写的数独游戏
 
